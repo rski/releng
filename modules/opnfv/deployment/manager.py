@@ -167,8 +167,9 @@ class Node(object):
             logger.error("The node %s is not active" % self.ip)
             return None
         _, stdout, stderr = (self.ssh_client.exec_command(cmd))
-        error = stderr.readlines()
-        if len(error) > 0:
+        rc = stdout.channel.recv_exit_status()
+        if rc != 0:
+            error = stderr.readlines()
             logger.error("error %s" % ''.join(error))
             return error
         output = ''.join(stdout.readlines()).rstrip()
